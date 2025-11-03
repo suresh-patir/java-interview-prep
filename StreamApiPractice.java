@@ -39,27 +39,30 @@ public class StreamApiPractice {
         //Convert a map to a list of “key=value” strings.
 //        convertMapIntoList();
         //Calculate Average of Numbers
-//        calculateAvgOfNumbers();
+        calculateAvgOfNumbers();
         //Find the Most Frequent Character in a String
-//        findMostFrequentCharacter();
+//        findMostFrequentCharacter(s);
     }
 
-    private static void findMostFrequentCharacter() {
-        String s= "fgastwewefsdew";
-        Character result = s.chars().mapToObj(c->(char)c).collect(Collectors.groupingBy(c->c,
-                Collectors.counting())).entrySet().stream().max(Comparator.comparing(Map.Entry::getValue)).map(Map.Entry::getKey).orElseThrow();
+    private static void findMostFrequentCharacter(String s) {
+        Character result= Optional.ofNullable(s).map(String::trim).filter(s1 -> !s.isBlank()).map(
+                s1 -> s1.chars().mapToObj(c->(char)c).collect(Collectors.groupingBy(
+                        c->c, Collectors.counting()
+                )).entrySet().stream().max(Comparator.comparing(Map.Entry::getValue)).map(Map.Entry::getKey).orElseThrow()
+        ).orElseThrow(()-> new RuntimeException("String can not be null or empty"));
         System.out.println(result);
     }
 
     private static void calculateAvgOfNumbers() {
         List<Integer> numbers = Arrays.asList(10, 20, 30, 40, 50);
-        Double average = numbers.stream().mapToInt(Integer::valueOf).average().orElse(0.0);
+        Double average = Optional.ofNullable(numbers).filter(list-> !list.isEmpty()).orElseThrow(()-> new RuntimeException("List can not be null or empty"))
+        .stream().mapToInt(Integer::valueOf).average().orElse(0.0);
         System.out.println(average);
     }
 
     private static void convertMapIntoList() {
         Map<String, Integer> map = Map.of("A", 1, "B", 2, "C", 3);
-        List<String> result = map.entrySet().stream().collect(Collectors.collectingAndThen(
+        List<String> result = Optional.of(map).filter(input-> !input.isEmpty()).orElseThrow(()-> new RuntimeException("Map can not be null or empty")).entrySet().stream().collect(Collectors.collectingAndThen(
                 Collectors.toList(),
                 entries -> entries.stream().map(entry-> entry.getKey() + "=" + entry.getValue()).toList()
         ));
